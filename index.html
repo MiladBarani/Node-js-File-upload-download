@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload and Download</title>
+
+    <!-- Bootstrap CSS CDN -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body class="container mt-5">
+    <h1>File Upload and Download</h1>
+
+    <form action="" method="post" enctype="multipart/form-data" id="uploadForm">
+      <div class="form-group">
+        <label for="file">Choose a File</label>
+        <input type="file" class="form-control" name="file" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Upload File</button>
+    </form>
+
+    <h2 class="mt-5">Download a File</h2>
+
+    <!-- List of uploaded files with download links -->
+    <ul id="fileList" class="list-group">
+      <!-- File items will be added dynamically using JavaScript -->
+    </ul>
+
+    <!-- Bootstrap JS and Popper.js CDN -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <!-- jQuery and Bootstrap JS CDN -->
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap Success Modal -->
+
+    <script>
+      // Dynamically determine the current window location's port
+      const port = window.location.port || "5001";
+
+      // Set up the upload form action dynamically
+      document.getElementById(
+        "uploadForm"
+      ).action = `http://localhost:${port}/upload`;
+
+      // Fetch the list of uploaded files and create download links
+      fetch(`http://localhost:${port}/files`)
+        .then((response) => response.json())
+        .then((files) => {
+          const fileList = document.getElementById("fileList");
+
+          files.forEach((file) => {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item";
+            const downloadLink = document.createElement("a");
+            const blobLink = document.createElement("p"); // New element for displaying blobUrl
+            // const timeDate = document.createElement("p"); // Time and Date
+
+            // Fetch the file as a Blob
+            fetch(`http://localhost:${port}/download/${file}`)
+              .then((response) => response.blob())
+              .then((blob) => {
+                const blobUrl = URL.createObjectURL(blob);
+
+                downloadLink.href = blobUrl;
+                downloadLink.textContent = `Download ${file}`;
+                //downloadLink.textContent = file;
+                downloadLink.download = file;
+
+                blobLink.textContent = `Blob URL: ${blobUrl}`;
+
+                listItem.appendChild(downloadLink);
+                listItem.appendChild(blobLink); // Append blobLink
+                fileList.appendChild(listItem);
+              })
+              .catch((error) =>
+                console.error("Error fetching file blob:", error)
+              );
+          });
+        })
+        .catch((error) => console.error("Error fetching file list:", error));
+    </script>
+  </body>
+</html>
